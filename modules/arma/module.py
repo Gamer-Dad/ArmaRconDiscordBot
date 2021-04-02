@@ -60,14 +60,14 @@ class CommandArma(commands.Cog):
             self.channel = self.bot.get_channel(int(self.cfg["post_channel"]))
             if(self.cfg["report_script_errors"] and self.channel):
                 self.readLog.EH.add_Event("Mission script error", self.mission_script_error)
-                self.readLog.EH.add_Event("Log new", self.newLog)
+                self.readLog.EH.add_Event("Server sessionID", self.serverRestarted)
             asyncio.ensure_future(self.readLog.watch_log())
             asyncio.ensure_future(self.memory_guard())
         except Exception as e:
             log.print_exc()
             log.error(e)
     
-    async def newLog(self, oldLog, newLog):
+    async def serverRestarted(self, oldLog, newLog):
         if(self.memoryRestart == True):
             await self.channel.send("Server restarted.")
             self.memoryRestart = False
@@ -81,7 +81,7 @@ class CommandArma(commands.Cog):
             if(self.mission_error_suppressed > 0):
                 await self.channel.send(":warning: {} Errors were suppressed\n``{}`` ``{}`` line ``{}``\nAdditional Errors will be suppressed for 10min.".format(self.mission_error_suppressed, text, self.readLog.current_log, line))
             else:    
-                await self.channel.send(":warning: ``{}`` line ``{}`` ``{}``\nAdditional Errors will be suppressed for 10min.".format(text, line, self.readLog.current_log))
+                await self.channel.send(":warning: ``{}`` ``{}`` line ``{}``\nAdditional Errors will be suppressed for 10min.".format(text, self.readLog.current_log, line))
             self.mission_error_suppressed = 0
             
             
